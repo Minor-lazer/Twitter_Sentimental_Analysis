@@ -1,0 +1,68 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+from nltk.tokenize import sent_tokenize, word_tokenize
+
+ps=PorterStemmer()
+
+import re
+ 
+dataset=pd.read_csv(r'C:\Users\USER\Desktop\Dataset\train.csv')
+#dataset['tweet'][0]
+processed_list=[]
+
+for i in range(31962):
+    
+    tweet=re.sub('[^a-zA-Z#]' ,'  ',dataset['tweet'][i])
+    tweet=tweet.lower()
+    tweet=tweet.split()
+    tweet=[ps.stem(token) for token in tweet if not token in set(stopwords.words('english'))]
+    tweet=' '.join(tweet)
+    processed_list.append(tweet)
+
+from sklearn.feature_extraction.text import CountVectorizer
+cv=CountVectorizer(max_features=3000)
+X=cv.fit_transform(processed_list)
+X=X.toarray()
+y=dataset.iloc[:,1].values
+print(cv.get_feature_names())
+
+from sklearn.model_selection import train_test_split
+X_train,X_test,y_train,y_test=train_test_split(X,y)
+
+from sklearn.linear_model import LogisticRegression
+log_reg=LogisticRegression()
+log_reg.fit(X_train,y_train)
+
+log_reg.score(X_train,y_train)
+log_reg.score(X_test,y_test)
+log_reg.score(X,y)
+
+from sklearn.neighbors import KNeighborsClassifier
+knn=KNeighborsClassifier()
+knn.fit(X_train,y_train)
+
+knn.score(X_train,y_train)
+knn.score(X_test,y_test)
+knn.score(X,y)
+
+from sklearn.tree import DecisionTreeClassifier
+ds=DecisionTreeClassifier()
+ds.fit(X_train,y_train)
+
+ds.score(X_train,y_train)
+ds.score(X_test,y_test)
+ds.score(x,y)
+
+from sklearn.naive_bayes import GaussianNB
+nb=GaussianNB()
+nb.fit(X_train,y_train)
+
+nb.score(X_train,y_train)
+nb.score(X_test,y_test)
+nb.score(x,y)
+
+
